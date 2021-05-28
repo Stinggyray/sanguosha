@@ -225,7 +225,6 @@ export default function setup(ctx, setupData) {
         isFlipped,
         harvest,
         privateZone,
-        unshuffledDeck,
         refusingDeath,
     };
 }
