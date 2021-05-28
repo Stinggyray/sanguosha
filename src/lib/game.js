@@ -1,10 +1,13 @@
 import { EQUIPMENT } from './cardCategories.js';
 import setup from './setup.js';
 import { drawCard, drawCards, discard, nextAlivePlayerPos } from './helper.js';
+let dead=[]
 
 /* Moves */
 
 function selectCharacter(G, ctx, index) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { startPlayerIndex, characterChoices, characters, healths } = G;
     const { numPlayers, playerID, playOrder } = ctx;
     const character = characterChoices[playerID][index];
@@ -22,6 +25,8 @@ function selectCharacter(G, ctx, index) {
 }
 
 function draw(G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands } = G;
     const { playerID } = ctx;
     const card = drawCard(G, ctx);
@@ -29,11 +34,15 @@ function draw(G, ctx) {
 }
 
 function judgment(G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const card = drawCard(G, ctx);
     discard(G, ctx, card);
 }
 
 function play(G, ctx, index, targetPlayerID, forceCategory) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands, equipment, isFlipped } = G;
     const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
@@ -55,6 +64,8 @@ function play(G, ctx, index, targetPlayerID, forceCategory) {
 }
 
 function pickUp(G, ctx, index) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { discard, hands } = G;
     const { playerID } = ctx;
     const [card] = discard.splice(index, 1);
@@ -62,6 +73,8 @@ function pickUp(G, ctx, index) {
 }
 
 function give(G, ctx, index, otherPlayerID) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands } = G;
     const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
@@ -72,6 +85,8 @@ function give(G, ctx, index, otherPlayerID) {
 }
 
 function dismantle(G, ctx, target) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands, equipment } = G;
     if (target.index !== undefined) {
         const [card] = hands[target.playerID].splice(target.index, 1);
@@ -84,6 +99,8 @@ function dismantle(G, ctx, target) {
 }
 
 function steal(G, ctx, target) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands, equipment } = G;
     const { playerID } = ctx;
     if (target.index !== undefined) {
@@ -97,17 +114,23 @@ function steal(G, ctx, target) {
 }
 
 function toggleChain(G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { isChained } = G;
     const { playerID } = ctx;
     isChained[playerID] = !isChained[playerID];
 }
 
 function flipObject(G, _ctx, objectID) {
+    if(dead.indexOf(_ctx.playerID)>=0)
+    {return}
     const { isFlipped } = G;
     isFlipped[objectID] = !isFlipped[objectID];
 }
 
 function reveal(G, ctx, index, otherPlayerID) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands, privateZone } = G;
     const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
@@ -122,6 +145,8 @@ function reveal(G, ctx, index, otherPlayerID) {
 }
 
 function returnCard(G, _ctx, id) {
+    if(dead.indexOf(_ctx.playerID)>=0)
+    {return}
     const { deck, hands, privateZone } = G;
     const index = privateZone.findIndex(item => item.card.id === id);
     const [{ card, source }] = privateZone.splice(index, 1);
@@ -133,6 +158,8 @@ function returnCard(G, _ctx, id) {
 }
 
 function harvest(G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { isAlive, harvest } = G;
     const { playOrder } = ctx;
     const numPlayers = playOrder.filter(player => isAlive[player]).length;
@@ -143,6 +170,8 @@ function harvest(G, ctx) {
 }
 
 function putDownHarvest(G, ctx, index) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands, harvest } = G;
     const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
@@ -153,6 +182,8 @@ function putDownHarvest(G, ctx, index) {
 }
 
 function pickUpHarvest(G, ctx, index) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { hands, harvest } = G;
     const { playerID } = ctx;
     const [card] = harvest.splice(index, 1);
@@ -165,6 +196,8 @@ function finishHarvest(G) {
 }
 
 function passLightning(G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { equipment } = G;
     const { numPlayers, playOrder } = ctx;
     for (let i = 0; i < numPlayers; i++) {
@@ -178,6 +211,8 @@ function passLightning(G, ctx) {
 }
 
 function astrology(G, ctx, numCards) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { isAlive, privateZone } = G;
     const { playerID, playOrder } = ctx;
     const actualNumCards = numCards || Math.min(playOrder.filter(player => isAlive[player]).length, 5);
@@ -198,6 +233,8 @@ function finishAstrology(G) {
 }
 
 function refusingDeath(G, ctx, change) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { healths, refusingDeath } = G;
     const { playerID, random } = ctx;
     if (change === -1) {
@@ -214,6 +251,8 @@ function refusingDeath(G, ctx, change) {
 }
 
 function alliance(G, _ctx, player1, player2) {
+    if(dead.indexOf(_ctx.playerID)>=0)
+    {return}
     const { hands } = G;
     const temp = hands[player1];
     hands[player1] = hands[player2];
@@ -221,6 +260,8 @@ function alliance(G, _ctx, player1, player2) {
 }
 
 function collapse(G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { healths } = G;
     const { playerID } = ctx;
     healths[playerID].max--;
@@ -233,6 +274,8 @@ function collapse(G, ctx) {
 }
 
 function updateHealth(G, ctx, change) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { healths } = G;
     const { playerID } = ctx;
     healths[playerID].current += change;
@@ -245,15 +288,19 @@ function updateHealth(G, ctx, change) {
 }
 
 function die(G, ctx) {
+
     const { isAlive } = G;
     const { currentPlayer, events, playerID } = ctx;
     delete isAlive[playerID];
+    dead.push(ctx.playerID)
     if (currentPlayer === playerID) {
         events.endTurn();
     }
 }
 
 function endPlay(G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { healths, hands } = G;
     const { currentPlayer, events, playerID } = ctx;
     if (currentPlayer === playerID) {
@@ -265,6 +312,8 @@ function endPlay(G, ctx) {
 }
 
 function discardCard(G, ctx, index) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { healths, hands } = G;
     const { events, playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
@@ -278,6 +327,8 @@ function discardCard(G, ctx, index) {
 }
 
 function finishDiscard(_G, ctx) {
+    if(dead.indexOf(ctx.playerID)>=0)
+    {return}
     const { currentPlayer, events, playerID } = ctx;
     if (currentPlayer === playerID) {
         events.endTurn();
