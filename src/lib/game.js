@@ -4,9 +4,9 @@ import { drawCard, drawCards, discard, nextAlivePlayerPos } from './helper.js';
 
 /* Moves */
 
-function selectCharacter(G, ctx, index) {
+function selectCharacter({G, ctx, playerID}, index) {
     const { startPlayerIndex, characterChoices, characters, healths } = G;
-    const { numPlayers, playerID, playOrder } = ctx;
+    const { numPlayers, playOrder } = ctx;
     const character = characterChoices[playerID][index];
     characterChoices[playerID] = undefined;
     characters[playerID] = character;
@@ -21,9 +21,9 @@ function selectCharacter(G, ctx, index) {
     };
 }
 
-function draw(G, ctx) {
+function draw({G, ctx, playerID}) {
     const { hands, hasJudgment } = G;
-    const { playerID, currentPlayer } = ctx;
+    const { currentPlayer } = ctx;
     const card = drawCard(G, ctx);
     if (playerID === currentPlayer && hasJudgment[playerID]) {
         flipObject(G, ctx, card.id);
@@ -34,14 +34,13 @@ function draw(G, ctx) {
     }
 }
 
-function judgment(G, ctx) {
+function judgment({G, ctx}) {
     const card = drawCard(G, ctx);
     discard(G, ctx, card);
 }
 
-function play(G, ctx, index, targetPlayerID, forceCategory) {
+function play({G, ctx, playerID}, index, targetPlayerID, forceCategory) {
     const { hands, equipment, isFlipped, hasJudgment } = G;
-    const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
     if (card === undefined) {
         return;
@@ -63,16 +62,14 @@ function play(G, ctx, index, targetPlayerID, forceCategory) {
     }
 }
 
-function pickUp(G, ctx, index) {
+function pickUp({G, ctx, playerID}, index) {
     const { discard, hands } = G;
-    const { playerID } = ctx;
     const [card] = discard.splice(index, 1);
     hands[playerID].push(card);
 }
 
-function give(G, ctx, index, otherPlayerID) {
+function give({G, ctx, playerID}, index, otherPlayerID) {
     const { hands } = G;
-    const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
     if (card === undefined) {
         return;
@@ -80,7 +77,7 @@ function give(G, ctx, index, otherPlayerID) {
     hands[otherPlayerID].push(card);
 }
 
-function dismantle(G, ctx, target) {
+function dismantle({G, ctx}, target) {
     const { hands, equipment, hasJudgment } = G;
     if (target.index !== undefined) {
         const [card] = hands[target.playerID].splice(target.index, 1);
@@ -95,9 +92,8 @@ function dismantle(G, ctx, target) {
     }
 }
 
-function steal(G, ctx, target) {
+function steal({G, ctx, playerID}, target) {
     const { hands, equipment, hasJudgment } = G;
-    const { playerID } = ctx;
     if (target.index !== undefined) {
         const [card] = hands[target.playerID].splice(target.index, 1);
         hands[playerID].push(card);
@@ -111,20 +107,18 @@ function steal(G, ctx, target) {
     }
 }
 
-function toggleChain(G, ctx) {
+function toggleChain({G, ctx, playerID}) {
     const { isChained } = G;
-    const { playerID } = ctx;
     isChained[playerID] = !isChained[playerID];
 }
 
-function flipObject(G, _ctx, objectID) {
+function flipObject({G}, objectID) {
     const { isFlipped } = G;
     isFlipped[objectID] = !isFlipped[objectID];
 }
 
-function reveal(G, ctx, index, otherPlayerID) {
+function reveal({G, ctx, playerID}, index, otherPlayerID) {
     const { hands, privateZone } = G;
-    const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
     if (card === undefined) {
         return;
@@ -136,7 +130,7 @@ function reveal(G, ctx, index, otherPlayerID) {
     });
 }
 
-function returnCard(G, _ctx, id) {
+function returnCard({G, id}) {
     const { deck, hands, privateZone } = G;
     const index = privateZone.findIndex(item => item.card.id === id);
     const [{ card, source }] = privateZone.splice(index, 1);
@@ -147,7 +141,7 @@ function returnCard(G, _ctx, id) {
     }
 }
 
-function harvest(G, ctx) {
+function harvest({G, ctx}) {
     const { isAlive, harvest } = G;
     const { playOrder } = ctx;
     const numPlayers = playOrder.filter(player => isAlive[player]).length;
@@ -157,9 +151,8 @@ function harvest(G, ctx) {
     }
 }
 
-function putDownHarvest(G, ctx, index) {
+function putDownHarvest({G, ctx, playerID}, index) {
     const { hands, harvest } = G;
-    const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
     if (card === undefined) {
         return;
@@ -167,33 +160,29 @@ function putDownHarvest(G, ctx, index) {
     harvest.push(card);
 }
 
-function pickUpHarvest(G, ctx, index) {
+function pickUpHarvest({G, ctx, playerID}, index) {
     const { hands, harvest } = G;
-    const { playerID } = ctx;
     const [card] = harvest.splice(index, 1);
     hands[playerID].push(card);
 }
 
-function finishHarvest(G) {
+function finishHarvest({G}) {
     const { discard, harvest } = G;
     discard.push(...harvest.splice(0, harvest.length).reverse());
 }
 
-function openCharacterZone(G, ctx, index) {
+function openCharacterZone({G, ctx, playerID}, index) {
     const { isCharacterZoneOpen } = G;
-    const { playerID } = ctx;
     isCharacterZoneOpen[playerID] = true;
 }
 
-function closeCharacterZone(G, ctx, index) {
+function closeCharacterZone({G, ctx, playerID}, index) {
     const { isCharacterZoneOpen } = G;
-    const { playerID } = ctx;
     isCharacterZoneOpen[playerID] = false;
 }
 
-function putOnCharacter(G, ctx, index) {
+function putOnCharacter({G, ctx, playerID}, index) {
     const { hands, putOnCharacterZone } = G;
-    const { playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
     if (card === undefined) {
         return;
@@ -204,14 +193,13 @@ function putOnCharacter(G, ctx, index) {
     });
 }
 
-function pickUpCharacter(G, ctx, index) {
+function pickUpCharacter({G, ctx, playerID}, index) {
     const { hands, putOnCharacterZone } = G;
-    const { playerID } = ctx;
     const [card] = putOnCharacterZone.splice(index, 1);
     hands[playerID].push(card.card);
 }
 
-function passLightning(G, ctx) {
+function passLightning({G, ctx}) {
     const { equipment } = G;
     const { numPlayers, playOrder } = ctx;
     for (let i = 0; i < numPlayers; i++) {
@@ -224,15 +212,14 @@ function passLightning(G, ctx) {
     }
 }
 
-function skipJudgment(G, ctx) {
+function skipJudgment({G, ctx, playerID}) {
     const { hasJudgment } = G;
-    const { playerID } = ctx;
     delete hasJudgment[playerID];
 }
 
-function astrology(G, ctx, numCards) {
+function astrology({G, ctx, playerID}, numCards) {
     const { isAlive, privateZone } = G;
-    const { playerID, playOrder } = ctx;
+    const { playOrder } = ctx;
     const actualNumCards = numCards || Math.min(playOrder.filter(player => isAlive[player]).length, 5);
     for (let i = 0; i < actualNumCards; i++) {
         const card = drawCard(G, ctx);
@@ -244,15 +231,14 @@ function astrology(G, ctx, numCards) {
     }
 }
 
-function finishAstrology(G) {
+function finishAstrology({G}) {
     const { deck, privateZone } = G;
     deck.splice(0, 0, ...privateZone.filter(item => item.source.deck).map(item => item.card));
     G.privateZone = privateZone.filter(item => !item.source.deck);
 }
 
-function winHearts(G, ctx) {
+function winHearts({G, ctx, playerID}) {
     const { privateZone } = G;
-    const { playerID } = ctx;
 
     for (let i = 0; i < 3; i++) {
         const card = drawCard(G, ctx);
@@ -264,15 +250,14 @@ function winHearts(G, ctx) {
     }
 }
 
-function finishWinHearts(G) {
+function finishWinHearts({G}) {
     const { discard, privateZone } = G;
     discard.push(...privateZone.filter(item => item.source.deck).map(item => item.card));
     G.privateZone = privateZone.filter(item => !item.source.deck);
 }
 
-function refusingDeath(G, ctx, change) {
+function refusingDeath({G, ctx, random, playerID}, change) {
     const { healths, refusingDeath } = G;
-    const { playerID, random } = ctx;
     if (change === -1) {
         const newValue = random.Die(13);
         refusingDeath.push(newValue);
@@ -286,16 +271,15 @@ function refusingDeath(G, ctx, change) {
     }
 }
 
-function alliance(G, _ctx, player1, player2) {
+function alliance({G}, player1, player2) {
     const { hands } = G;
     const temp = hands[player1];
     hands[player1] = hands[player2];
     hands[player2] = temp;
 }
 
-function collapse(G, ctx) {
+function collapse({G, ctx, playerID}) {
     const { healths } = G;
-    const { playerID } = ctx;
     healths[playerID].max--;
     if (healths[playerID].max < 0) {
         healths[playerID].max = 8;
@@ -305,9 +289,8 @@ function collapse(G, ctx) {
     }
 }
 
-function updateHealth(G, ctx, change) {
+function updateHealth({G, ctx, playerID}, change) {
     const { healths } = G;
-    const { playerID } = ctx;
     healths[playerID].current += change;
     if (healths[playerID].current > healths[playerID].max) {
         healths[playerID].current = healths[playerID].max;
@@ -317,9 +300,8 @@ function updateHealth(G, ctx, change) {
     }
 }
 
-function updateMaxHealth(G, ctx, change) {
+function updateMaxHealth({G, ctx, playerID}, change) {
     const { healths } = G;
-    const { playerID } = ctx;
     healths[playerID].max += change;
     if (healths[playerID].max < 1) {
         healths[playerID].max = 1;
@@ -332,18 +314,18 @@ function updateMaxHealth(G, ctx, change) {
     }
 }
 
-function die(G, ctx) {
+function die({G, ctx, events, playerID}) {
     const { isAlive } = G;
-    const { currentPlayer, events, playerID } = ctx;
+    const { currentPlayer } = ctx;
     delete isAlive[playerID];
     if (currentPlayer === playerID) {
         events.endTurn();
     }
 }
 
-function endPlay(G, ctx) {
+function endPlay({G, ctx, events, playerID}) {
     const { healths, hands } = G;
-    const { currentPlayer, events, playerID } = ctx;
+    const { currentPlayer } = ctx;
     if (currentPlayer === playerID) {
         events.setStage('discard');
         if (hands[playerID].length <= healths[playerID].current) {
@@ -352,9 +334,8 @@ function endPlay(G, ctx) {
     }
 }
 
-function discardCard(G, ctx, index) {
+function discardCard({G, ctx, events, playerID}, index) {
     const { healths, hands } = G;
-    const { events, playerID } = ctx;
     const [card] = hands[playerID].splice(index, 1);
     if (card === undefined) {
         return;
@@ -365,8 +346,8 @@ function discardCard(G, ctx, index) {
     }
 }
 
-function finishDiscard(_G, ctx) {
-    const { currentPlayer, events, playerID } = ctx;
+function finishDiscard({events, ctx, playerID}) {
+    const { currentPlayer } = ctx;
     if (currentPlayer === playerID) {
         events.endTurn();
     }
@@ -375,8 +356,8 @@ function finishDiscard(_G, ctx) {
 /* Game object */
 
 const turnOrder = {
-    first: G => G.startPlayerIndex,
-    next: (G, ctx) => nextAlivePlayerPos(G, ctx, ctx.playOrderPos),
+    first: ({G}) => G.startPlayerIndex,
+    next: ({G, ctx}) => nextAlivePlayerPos(G, ctx, ctx.playOrderPos),
 };
 
 export const SanGuoSha = {
@@ -384,7 +365,7 @@ export const SanGuoSha = {
 
     setup,
 
-    playerView: (G, ctx, playerID) => {
+    playerView: ({G, ctx, playerID}) => {
         const { roles, characterChoices, characters, isAlive } = G;
         const { numPlayers, playOrder } = ctx;
 
@@ -416,48 +397,46 @@ export const SanGuoSha = {
         selectCharacters: {
             start: true,
 
-            onBegin: (G, ctx) => {
-                const { startPlayerIndex } = G;
-                const { events, playOrder } = ctx;
-                events.setActivePlayers({
-                    value: {[playOrder[startPlayerIndex]]: 'selectCharacter'},
-                    moveLimit: 1,
-                    next: {
-                        others: 'selectCharacter',
-                        moveLimit: 1,
-                    }
-                });
-
-                // make character choices automatically for easier testing
-                // TODO remove
-                // playOrder.forEach(player => selectCharacter(G, { ...ctx, playerID: player }, 0));
-            },
-
             // end select characters phase if everyone has made a character choice
-            endIf: G => Object.values(G.characterChoices).every(choices => choices === undefined),
+            endIf: ({G}) => Object.values(G.characterChoices).every(choices => choices === undefined),
 
             next: 'play',
 
             turn: {
                 order: turnOrder,
+                onBegin: ({G, ctx, events}) => {
+                    const { startPlayerIndex } = G;
+                    const { playOrder } = ctx;
+
+                    events.setActivePlayers({
+                        value: {[playOrder[startPlayerIndex]]: 'selectCharacter'},
+                        moveLimit: 1,
+                        next: {
+                            others: 'selectCharacter',
+                            moveLimit: 1,
+                        }
+                    });
+
+                    // DEBUG: make character choices automatically for easier testing
+                    // playOrder.forEach(player => selectCharacter({G, ctx, playerID: player }, 0));
+                },
                 stages: {
                     selectCharacter: {
                         moves: { selectCharacter },
                     },
                 },
-            }
+            },
         },
 
         play: {
-            onBegin: (G, ctx) => {
+            onBegin: ({G, ctx}) => {
                 const { playOrder } = ctx;
                 playOrder.forEach(player => drawCards(G, ctx, player, 4));
             },
 
             turn: {
                 order: turnOrder,
-                onBegin: (_G, ctx) => {
-                    const { events } = ctx;
+                onBegin: ({ ctx, events}) => {
                     // everyone can play cards in freeform mode
                     events.setActivePlayers({ all: 'play' });
                 },
@@ -510,7 +489,7 @@ export const SanGuoSha = {
 
     maxPlayers: 10,
 
-    endIf: (G, ctx) => {
+    endIf: ({G, ctx}) => {
         const { isAlive } = G;
         const { playOrder } = ctx;
         return playOrder.filter(player => isAlive[player]).length === 1;

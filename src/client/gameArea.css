@@ -38,29 +38,29 @@ img {
 }
 
 .decrease-health {
-    background-image: url('/health/health-red.png');
+    background-image: url('./imgs/health-red.png');
     background-size: cover;
 }
 
 .increase-health {
-    background-image: url('/health/health-green.png');
+    background-image: url('./imgs/health-green.png');
     background-size: cover;
 }
 
 .decrease-max-health {
-    background-image: url('/health/health-minus.png');
+    background-image: url('./imgs/health-minus.png');
     background-size: contain;
     background-repeat: no-repeat;
 }
 
 .increase-max-health {
-    background-image: url('/health/health-plus.png');
+    background-image: url('./imgs/health-plus.png');
     background-size: contain;
     background-repeat: no-repeat;
 }
 
 .chain {
-    background-image: url('/chain.png');
+    background-image: url('./imgs/chain.png');
     background-size: cover;
 }
 
@@ -88,13 +88,22 @@ img {
     color: black;
 }
 
-.help-panel > img {
+.help-panel-card {
+    position: relative;
+    height: 100%;
+    width: 21.25vh;
+    float: left;
+    margin-right: 3px;
+    padding: 0px;
+}
+
+.help-panel-img {
     height: 100%;
     float: left;
     margin-right: 3px;
 }
 
-.help-panel > div {
+.help-panel-div {
     padding: 20px;
     height: calc(100% - 40px);
     overflow: auto;
@@ -166,3 +175,19 @@ button.selectable:active {
 button.disabled {
     background-color: gray;
 }
+
+.card-mode {
+    background-size: cover;
+    position: fixed;
+    bottom: 40px;
+    left: 5px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background-color: lightgray;
+}
+
+.card-mode.cycle {
+    background-image: url('./imgs/card-mode.png');
+}
+

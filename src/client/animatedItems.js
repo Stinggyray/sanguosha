@@ -11,7 +11,8 @@ export default props => {
         animated, // (item, props) => <animated className='positioned item' />
     } = props;
 
-    const transitions = useTransition(items, item => item.key, {
+    const transitions = useTransition(items, {
+        keys: item => item.key,
         from,
         enter: update,
         update,
@@ -19,7 +20,7 @@ export default props => {
         unique: true,
     });
 
-    return transitions.map(({ item, props }) => {
+    return transitions((props, item) => {
         let child = animated(item, props);
         if (clickable) {
             child = <div

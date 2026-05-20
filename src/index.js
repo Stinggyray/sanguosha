@@ -1,6 +1,6 @@
 import * as classNames from 'classnames';
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Room from './client/room';
 import Lobby from './client/lobby';
 
@@ -9,7 +9,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.audio = new Audio();
-        this.audio.src = './bgm.mp3';
+        this.audio.src = '/bgm.mp3';
         this.audio.volume = 0.1;
         this.audio.loop = true;
         this.audio.play();
@@ -30,4 +30,6 @@ class App extends React.Component {
     }
 }
 
-render(<App />, document.getElementById("root"));
+//render(<App />, document.getElementById("root"));
+const root = createRoot(document.getElementById("root"))
+root.render(<App />);

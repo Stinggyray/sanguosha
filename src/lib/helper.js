@@ -1,6 +1,5 @@
 export function drawCard(G, ctx) {
     const { deck, discard, isFlipped } = G;
-    // const { random } = ctx;
 
     const card = deck.pop();
 

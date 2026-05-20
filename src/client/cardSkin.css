@@ -1,0 +1,133 @@
+.card-value {
+    position: absolute;
+    left: 2px;
+    top: 1px;
+    font-size: 18px;
+    background: radial-gradient(rgba(200, 200, 170, 1), rgba(200, 200, 170, 1), rgba(200, 200, 170, 0));
+    width: 20px;
+    height: 44px;
+    padding: 4px;
+    text-align: center;
+    border-radius: 3px;
+}
+
+.red {
+    color: rgb(140, 0, 0);
+}
+
+.black {
+    color: rgb(0, 0, 0);
+}
+
+.fill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sts-frame {
+    position: absolute;
+    height: auto;
+    object-fit: contain;
+    max-width: 100%;
+}
+.sts-component {
+    position: absolute;
+    height: auto;
+    object-fit: contain;
+    max-width: 100%;
+    width: 81.5%;
+    left: 9.25%;
+    top: 10.91%;
+}
+
+.sts-text {
+    font-family: 'Kreon,Kreon Fallback';
+    font-style: normal;
+    x: "50%";
+}
+.name {
+    letter-spacing: 1.25px;
+    fill: #fff6e2;
+    stroke-width: 8px;
+    paint-order: stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    font-size: 36px;
+    font-weight: 300;
+    filter: drop-shadow(1.5px 1.5px 0 rgba(0,0,0,0.25));
+}
+.cat {
+    letter-spacing: 0.5px;
+    fill: oklch(0 0 0 / 0.7);
+    font-weight: 600;
+    font-size: 12px;
+}
+.desc {
+    width: 100%;
+    height: 100%;
+    letter-spacing: 0.75px;
+    color: #fff6e2;
+    font-weight: 300;
+    text-shadow: 1px 1px lab(0% 0 0/.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 17px;
+    line-height: 17.5px;
+}
+.desc-frame {
+    position: absolute;
+    height: auto;
+    width: 81.5%;
+    left: 9.25%;
+    top: 55%;
+}
+
+.sts-text.common {
+    stroke: #4f4547;
+}
+.sts-text.uncommon {
+    stroke: #075d74;
+}
+.sts-text.rare {
+    stroke: #6c4b04
+}
+.sts-text.curse {
+    stroke: #560b9f
+}
+
+.rarity.common {
+    filter: hue-rotate(-145deg)grayscale(.9)brightness(.775)
+}
+
+.rarity.rare {
+    filter: hue-rotate(-145deg)brightness(1.075)saturate(1.9)
+}
+.rarity.event {
+    filter: hue-rotate(-78deg)brightness(.9)saturate(1.25)
+}
+.rarity.curse {
+    filter: hue-rotate(78deg)brightness(.8)saturate(2.55)
+}
+
+.color.green {
+    filter: hue-rotate(97deg)brightness(1.5)saturate(.6)
+}
+.color.orange {
+    filter: hue-rotate(55deg)brightness(1.25)saturate(2.25)
+}
+.color.pink {
+    filter: hue-rotate(-23deg)brightness(1.3)saturate(.55)
+}
+.color.blue {
+    filter: hue-rotate(217deg)brightness(1.3)saturate(.625)
+}
+.color.colorless {
+    filter: grayscale()brightness(1.35)
+}
+.color.black {
+    filter: hue-rotate(-60deg)grayscale(.9)brightness(.6)
+}

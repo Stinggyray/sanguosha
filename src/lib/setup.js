@@ -5,6 +5,10 @@
 import CHARACTERS from './characters.js';
 import { ROLE_DIST, ROLE_DIST_LABELS } from './roles.js';
 
+const BANLIST = [
+    'Yu Ji', // Guessing card guy
+];
+
 const CARDS = [
     { value: 'A', suit: 'CLUB', type: 'Crossbow' },
     { value: 'A', suit: 'CLUB', type: 'Duel' },
@@ -168,8 +172,8 @@ const CARDS = [
     { value: 'K', suit: 'SPADE', type: 'Barbarians' },
 ];
 
-export default function setup(ctx, setupData) {
-    const { numPlayers, playOrder, random } = ctx;
+export default function setup({random, ctx}, setupData) {
+    const { numPlayers, playOrder } = ctx;
     const expansions = (setupData || {}).expansions || [];
 
     const unshuffledRoles = [];
@@ -184,10 +188,12 @@ export default function setup(ctx, setupData) {
     }
     const startPlayerIndex = roles.findIndex(role => role.name === 'King');
 
-    const allCharacters = CHARACTERS.filter(c => c.expansion === undefined || expansions.includes(c.expansion));
+    const allCharacters = CHARACTERS.filter(c => (c.expansion === undefined || expansions.includes(c.expansion)) && !BANLIST.includes(c.name));
     const numCharacterChoices = 3 * (numPlayers + 1) <= allCharacters.length ? 3 : 2;
     const monarchChoices = random.Shuffle(allCharacters.filter(c => c.isMonarch));
-    monarchChoices[0] = CHARACTERS.filter(c => c.name === 'Jiang Wei')[0];
+    // monarchChoices[0] = CHARACTERS.filter(c => c.name === 'Lu Su')[0];
+    // monarchChoices[1] = CHARACTERS.filter(c => c.name === 'Zhou Tai')[0];
+    // monarchChoices[2] = CHARACTERS.filter(c => c.name === 'Ma Su')[0];
     const normalCharacters = random.Shuffle(allCharacters.filter(c => !monarchChoices.includes(c)));
     const characterChoices = Object.fromEntries(playOrder.map((player, i) =>
         [player, normalCharacters.slice(numCharacterChoices * i, numCharacterChoices * (i + 1))]));

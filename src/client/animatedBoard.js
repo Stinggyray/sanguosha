@@ -1,20 +1,13 @@
 import * as classNames from 'classnames';
 import React from 'react';
-import { animated, interpolate } from 'react-spring';
+import { animated, to } from 'react-spring';
 import AnimatedItems from './animatedItems';
-import './animatedBoard.css';
-
-const SUITS = {
-    'CLUB': '♣',
-    'DIAMOND': '♢',
-    'HEART': '♡',
-    'SPADE': '♠',
-};
+import CardSkin from './cardSkin';
 
 export default class AnimatedBoard extends React.Component {
 
     render() {
-        const { width, height, scaledWidth, scaledHeight, characterCards, healthPoints, normalCards } = this.props;
+        const { width, height, scaledWidth, scaledHeight, characterCards, healthPoints, normalCards, cardMode } = this.props;
         return <div>
             <AnimatedItems
                 items={characterCards}
@@ -32,10 +25,10 @@ export default class AnimatedBoard extends React.Component {
                     const { faceUp, opacity, left, top } = props;
                     return <animated.img
                         className='positioned item shadow'
-                        src={faceUp.interpolate(faceUp => faceUp > 0.5 ? `./characters/${item.name}.jpg` : './characters/Character Back.jpg')}
+                        src={faceUp.to(faceUp => faceUp > 0.5 ? `/characters/${item.name}.jpg` : './characters/Character Back.jpg')}
                         alt={item.name}
                         style={{
-                            transform: faceUp.interpolate(faceUp => `rotateY(${faceUp * 180 - (faceUp > 0.5 ? 180 : 0)}deg)`),
+                            transform: faceUp.to(faceUp => `rotateY(${faceUp * 180 - (faceUp > 0.5 ? 180 : 0)}deg)`),
                             opacity,
                             left,
                             top,
@@ -51,7 +44,7 @@ export default class AnimatedBoard extends React.Component {
                 animated={(item, props) => <animated.img
                     key={item.key}
                     className='positioned item'
-                    src={`./health/health-${item.color}.png`}
+                    src={`/health/health-${item.color}.png`}
                     alt='health'
                     style={{
                         opacity: props.opacity,
@@ -73,16 +66,17 @@ export default class AnimatedBoard extends React.Component {
                         left: item.left,
                         top: item.top,
                         scale: item.scale,
+                        alwaysDown: item.alwaysDown,
                     };
                 }}
                 clickable={true}
                 animated={(item, props) => {
-                    const { faceUp, sideways, opacity, left, top, scale } = props;
+                    const { faceUp, sideways, opacity, left, top, scale, alwaysDown } = props;
                     return <animated.div
                         className='positioned'
                         style={{
                             transformOrigin: '0 0',
-                            transform: interpolate([sideways, scale], (sideways, scale) => `scale(${scale}) rotateZ(${sideways * 90}deg)`),
+                            transform: to([sideways, scale], (sideways, scale) => `scale(${scale}) rotateZ(${sideways * 90}deg)`),
                             opacity,
                             left,
                             top,
@@ -93,28 +87,19 @@ export default class AnimatedBoard extends React.Component {
                         <animated.div
                             className={classNames('positioned', 'item', item?.className)}
                             style={{
-                                transform: faceUp?.interpolate(faceUp => `rotateY(${faceUp * 180 - (faceUp > 0.5 ? 180 : 0)}deg)`),
+                                transform: faceUp?.to(faceUp => `rotateY(${faceUp * 180 - (faceUp > 0.5 ? 180 : 0)}deg)`),
                                 left: 0,
                                 top: 0,
                                 width: '100%',
                                 height: '100%',
                             }}
                         >
-                            <animated.img
-                                className='fill'
-                                src={faceUp.interpolate(faceUp => faceUp > 0.5 ? `./cards/${item.card.type}.jpg` : './cards/Card Back.jpg')}
-                                alt={'card'}
+                            <CardSkin
+                                cardMode={cardMode}
+                                faceUp={faceUp}
+                                alwaysDown={alwaysDown}
+                                card={item.card}
                             />
-                            <animated.div
-                                className={classNames('card-value', ['DIAMOND', 'HEART'].includes(item.card.suit) ? 'red' : 'black')}
-                                style={{
-                                    opacity: faceUp,
-                                }}
-                            >
-                                {item.card.value}
-                                <br />
-                                {SUITS[item.card.suit]}
-                            </animated.div>
                         </animated.div>
                     </animated.div>
                 }}

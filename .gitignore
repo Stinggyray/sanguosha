@@ -1,5 +1,9 @@
 /node_modules
+/old_node_modules
 .idea/
 build/
 github-help.txt
 package-lock.json
+old_package-lock.json
+/assets
+/.vscode

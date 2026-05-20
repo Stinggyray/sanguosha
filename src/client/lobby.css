@@ -65,11 +65,11 @@
 }
 
 .toggle-sound.off {
-    background-image: url('/sound-off.png');
+    background-image: url('./imgs/sound-off.png');
 }
 
 .toggle-sound.on {
-    background-image: url('/sound-on.png');
+    background-image: url('./imgs/sound-on.png');
 }
 
 .leave-button {

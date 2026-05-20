@@ -105,7 +105,7 @@ export default class SanGuoShaLobby extends React.Component {
         }
         return <div className='lobby'>
             <div className='title'>
-                <img src='./name.png' alt='sanguosha' />
+                <img src={'./name.png'} alt='sanguosha' />
             </div>
             <div id="lobby-view">{this.renderLobby()}</div>
         </div>;
@@ -213,7 +213,7 @@ export default class SanGuoShaLobby extends React.Component {
                     <button
                         key="watch"
                         onClick={() => this.leaveMatch()
-                            .then(() => this.setState({ matchInfo: { matchID: matchID, playerID: '-1', }, inGame: true }))}
+                            .then(() => this.setState({ matchInfo: { matchID: matchID, }, inGame: true }))}
                     >
                         {'Watch'}
                     </button>

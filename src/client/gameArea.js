@@ -5,6 +5,7 @@ import RULES from '../lib/rules.json';
 import SetModePanel from './setModePanel';
 import AnimatedBoard from './animatedBoard';
 import './gameArea.css';
+import {createSgsCard, createStsCard} from './cardSkin';
 
 // Standard margin between objects
 const DELTA = 10;
@@ -24,6 +25,14 @@ const DECK_RATIO = 0.5;
 // Ratio of cards in the middle to normal cards
 const MIDDLE_CARD_RATIO = 0.7;
 
+const CARD_MODE = 'cardMode';
+
+function get_next(currCardMode) {
+    if (currCardMode === '' || currCardMode === 'sgs') return 'sts';
+    return 'sgs';
+};
+
+
 export default class GameArea extends React.Component {
 
     constructor(props) {
@@ -32,6 +41,7 @@ export default class GameArea extends React.Component {
             mode: SetModePanel.DEFAULT_MODE,
             selectedIndex: undefined,
             helpCard: undefined,
+            cardMode: window.localStorage.getItem(CARD_MODE),
         };
     }
 
@@ -91,6 +101,13 @@ export default class GameArea extends React.Component {
         normalCards.push(...middleCards);
 
         return <div>
+            <button
+                className={classNames('card-mode', 'cycle')}
+                onClick={() => {
+                    this.setState({ cardMode: get_next(this.state.cardMode) });
+                    window.localStorage.setItem(CARD_MODE, get_next(this.state.cardMode));
+                }}
+            />
             {this.renderMyArea()}
             <AnimatedBoard
                 width={width}
@@ -100,6 +117,7 @@ export default class GameArea extends React.Component {
                 characterCards={characterCards}
                 healthPoints={healthPoints}
                 normalCards={normalCards}
+                cardMode={this.state.cardMode}
             />
             {nodes}
             {this.renderActionButton()}
@@ -120,7 +138,7 @@ export default class GameArea extends React.Component {
                 if (mode === SetModePanel.DEFAULT_MODE) {
                     onClick = () => this.setState({ selectedIndex: i === selectedIndex ? undefined : i });
                 } else if (mode === SetModePanel.HELP_MODE) {
-                    onClick = () => this.setState({ helpCard: { key: choice.name, src: `./characters/${choice.name}.jpg` } });
+                    onClick = () => this.setState({ helpCard: { key: choice.name, src: `/characters/${choice.name}.jpg` } });
                 }
                 characterCards.push({
                     key: `character-${choice.name}`,
@@ -164,11 +182,11 @@ export default class GameArea extends React.Component {
         nodes.push(<img
             key={`role-${role.id}`}
             className='positioned'
-            src={`./roles/${roleName}.jpg`}
+            src={`/roles/${roleName}.jpg`}
             alt={roleName}
             style={{
                 left: playerArea.x + (1 - ROLE_RATIO) * scaledWidth - INFO_DELTA,
-                top: playerArea.y + INFO_DELTA,
+                top: playerArea.y + INFO_DELTA + scaledHeight * 0.05, // leave room for health bar
                 width: scaledWidth * ROLE_RATIO,
                 height: scaledHeight * ROLE_RATIO,
             }}
@@ -201,7 +219,7 @@ export default class GameArea extends React.Component {
                 this.setState({ mode: SetModePanel.DEFAULT_MODE });
             };
         } else if (mode === SetModePanel.HELP_MODE) {
-            onClick = () => this.setState({ helpCard: { key: character.name, src: `./characters/${character.name}.jpg` } });
+            onClick = () => this.setState({ helpCard: { key: character.name, src: `/characters/${character.name}.jpg` } });
         } else if (mode === SetModePanel.COUNTRY_SCENE_MODE && selectedIndex !== undefined) {
             onClick = () => {
                 moves.play(selectedIndex, player, 'Capture');
@@ -239,7 +257,7 @@ export default class GameArea extends React.Component {
         const { G, moves, playerID, width, height, scaledWidth, scaledHeight } = this.props;
         const { characters, healths, isAlive, refusingDeath } = G;
 
-        const isRefusingDeath = characters[playerID] && characters[playerID].name === 'Zhou Tai' && healths[player].current <= 0;
+        const isRefusingDeath = characters[player] && characters[player].name === 'Zhou Tai' && healths[player].current <= 0;
         const isDying = isRefusingDeath ? new Set(refusingDeath).size < refusingDeath.length : healths[player].current <= 0;
 
         for (let i = 0; i < (isRefusingDeath ? refusingDeath.length : healths[player].max); i++) {
@@ -324,10 +342,14 @@ export default class GameArea extends React.Component {
                 key='decrease-max-health'
                 className='positioned image-div selectable decrease-max-health'
                 style={{
-                    left: playerArea.x + scaledWidth * 0.265,
-                    top: playerArea.y + scaledHeight * 0.2,
-                    width: scaledWidth * 0.09,
-                    height: scaledHeight * 0.075,
+                    // left: playerArea.x + scaledWidth * 0.265,
+                    // top: playerArea.y + scaledHeight * 0.2,
+                    // width: scaledWidth * 0.09,
+                    // height: scaledHeight * 0.075,
+                    left: playerArea.x + scaledWidth * (0.23 - 1.25*0.06),
+                    top: playerArea.y + scaledHeight * 0.01,
+                    width: scaledWidth * 0.06,
+                    height: scaledHeight * 0.05,
                 }}
                 onClick={() => (moves.updateMaxHealth)(-1)}
             />);
@@ -338,10 +360,14 @@ export default class GameArea extends React.Component {
                 key='increase-max-health'
                 className='positioned image-div selectable increase-max-health'
                 style={{
-                    left: playerArea.x + scaledWidth * 0.375,
-                    top: playerArea.y + scaledHeight * 0.2,
-                    width: scaledWidth * 0.09,
-                    height: scaledHeight * 0.075,
+                    // left: playerArea.x + scaledWidth * 0.375,
+                    // top: playerArea.y + scaledHeight * 0.2,
+                    // width: scaledWidth * 0.09,
+                    // height: scaledHeight * 0.075,
+                    left: playerArea.x + scaledWidth * (0.23 + 10.25 * 0.06),
+                    top: playerArea.y + scaledHeight * 0.01,
+                    width: scaledWidth * 0.06,
+                    height: scaledHeight * 0.05,
                 }}
                 onClick={() => (moves.updateMaxHealth)(1)}
             />);
@@ -361,7 +387,7 @@ export default class GameArea extends React.Component {
                 className={classNames('positioned image-div chain', { 'gray': !isChained[player] }, { 'selectable': onClick !== undefined })}
                 style={{
                     left: playerArea.x + (1 - ROLE_RATIO) * scaledWidth - 2 * INFO_DELTA,
-                    top: playerArea.y + scaledHeight * 0.2,
+                    top: playerArea.y + scaledHeight * 0.25,
                     width: scaledWidth * ROLE_RATIO + 2 * INFO_DELTA,
                     height: scaledHeight * 0.16,
             }}
@@ -389,7 +415,7 @@ export default class GameArea extends React.Component {
                         this.setState({ mode: SetModePanel.DEFAULT_MODE });
                     };
                 } else if (mode === SetModePanel.HELP_MODE) {
-                    onClick = () => this.setState({ helpCard: { key: card.type, src: `./cards/${card.type}.jpg` } });
+                    onClick = () => this.setState({ helpCard: { key: card.type, card: card } });
                 }
                 if (i < 4) {
                     // Equipment cards
@@ -402,6 +428,7 @@ export default class GameArea extends React.Component {
                         left: playerArea.x + (scaledWidth - (CARD_RATIO * scaledWidth + INFO_DELTA) * (2 - i % 2)),
                         top: playerArea.y + (scaledHeight - (CARD_RATIO * scaledHeight + INFO_DELTA) * (2 - Math.floor(i / 2))),
                         scale: CARD_RATIO,
+                        alwaysDown: false,
                         onClick,
                     });
                 } else {
@@ -416,6 +443,7 @@ export default class GameArea extends React.Component {
                         left: playerArea.x + scaledWidth * 0.33,
                         top: playerArea.y + scaledHeight * (0.16 + 0.18 * (i - 4)),
                         scale: CARD_RATIO,
+                        alwaysDown: false,
                         onClick,
                     });
                 }
@@ -448,6 +476,7 @@ export default class GameArea extends React.Component {
                 left: playerArea.x + INFO_DELTA,
                 top: playerArea.y + (1 - CARD_RATIO) * scaledHeight - INFO_DELTA,
                 scale: CARD_RATIO,
+                alwaysDown: true,
                 onClick,
             });
         });
@@ -486,6 +515,7 @@ export default class GameArea extends React.Component {
                 left: playerArea.x + INFO_DELTA + scaledWidth * 0.22,
                 top: playerArea.y + (1 - CARD_RATIO * 0.5) * scaledHeight - INFO_DELTA,
                 scale: CARD_RATIO * 0.5,
+                alwaysDown: true,
                 onClick,
             });
         });
@@ -531,6 +561,7 @@ export default class GameArea extends React.Component {
                 left: DELTA * (1 - i / MAX_CARDS_SHOWN),
                 top: height - scaledHeight * DECK_RATIO - DELTA * (i / MAX_CARDS_SHOWN),
                 scale: DECK_RATIO,
+                alwaysDown: true,
                 onClick,
             });
         });
@@ -552,6 +583,7 @@ export default class GameArea extends React.Component {
                     left: DECK_RATIO * scaledWidth + 2 * DELTA + spacing * i,
                     top: height - scaledHeight - DELTA,
                     scale: 1,
+                    alwaysDown: false,
                     onClick,
                 });
             })
@@ -570,7 +602,7 @@ export default class GameArea extends React.Component {
             if (mode === SetModePanel.DEFAULT_MODE) {
                 onClick = () => moves.returnCard(card.id);
             } else if (mode === SetModePanel.HELP_MODE) {
-                onClick = () => this.setState({ helpCard: { key: card.type, src: `./cards/${card.type}.jpg` } });
+                onClick = () => this.setState({ helpCard: { key: card.type, card: card } });
             }
             normalCards.push({
                 key: `card-${card.id}`,
@@ -581,6 +613,7 @@ export default class GameArea extends React.Component {
                 left: startX + (scaledWidth * MIDDLE_CARD_RATIO + DELTA) * i,
                 top: (height - scaledHeight * MIDDLE_CARD_RATIO) / 2,
                 scale: MIDDLE_CARD_RATIO,
+                alwaysDown: false,
                 onClick: middleCardsFound ? undefined : onClick,
             });
         });
@@ -601,7 +634,7 @@ export default class GameArea extends React.Component {
             if (mode === SetModePanel.DEFAULT_MODE) {
                 onClick = () => moves.pickUpCharacter(card.id);
             } else if (mode === SetModePanel.HELP_MODE) {
-                onClick = () => this.setState({ helpCard: { key: card.type, src: `./cards/${card.type}.jpg` } });
+                onClick = () => this.setState({ helpCard: { key: card.type, card: card } });
             }
             normalCards.push({
                 key: `card-${card.id}`,
@@ -612,6 +645,7 @@ export default class GameArea extends React.Component {
                 left: startX + (scaledWidth * MIDDLE_CARD_RATIO + DELTA) * i,
                 top: (height - scaledHeight * MIDDLE_CARD_RATIO) / 2,
                 scale: MIDDLE_CARD_RATIO,
+                alwaysDown: false,
                 onClick: middleCardsFound ? undefined : onClick,
             });
         });
@@ -632,7 +666,7 @@ export default class GameArea extends React.Component {
             if (mode === SetModePanel.DEFAULT_MODE) {
                 onClick = () => moves.pickUpHarvest(i);
             } else if (mode === SetModePanel.HELP_MODE) {
-                onClick = () => this.setState({ helpCard: { key: card.type, src: `./cards/${card.type}.jpg` } });
+                onClick = () => this.setState({ helpCard: { key: card.type, card: card } });
             }
             normalCards.push({
                 key: `card-${card.id}`,
@@ -643,6 +677,7 @@ export default class GameArea extends React.Component {
                 left: startX + (scaledWidth * MIDDLE_CARD_RATIO + DELTA) * i,
                 top: (height - scaledHeight * MIDDLE_CARD_RATIO) / 2,
                 scale: MIDDLE_CARD_RATIO,
+                alwaysDown: false,
                 onClick: middleCardsFound ? undefined : onClick,
             });
         });
@@ -668,7 +703,7 @@ export default class GameArea extends React.Component {
                     this.setState({ mode: SetModePanel.DEFAULT_MODE });
                 };
             } else if (mode === SetModePanel.HELP_MODE) {
-                onClick = () => this.setState({ helpCard: { key: card.type, src: `./cards/${card.type}.jpg` } });
+                onClick = () => this.setState({ helpCard: { key: card.type, card: card } });
             }
             normalCards.push({
                 key: `card-${card.id}`,
@@ -679,6 +714,7 @@ export default class GameArea extends React.Component {
                 left: startX + (scaledWidth * MIDDLE_CARD_RATIO + DELTA) * i,
                 top: (height - scaledHeight * MIDDLE_CARD_RATIO) / 2,
                 scale: MIDDLE_CARD_RATIO,
+                alwaysDown: false,
                 onClick: middleCardsFound ? undefined : onClick,
             });
         }
@@ -789,12 +825,19 @@ export default class GameArea extends React.Component {
 
     renderHelp() {
         const { mode, helpCard } = this.state;
+        var imgDiv
         if (mode === SetModePanel.HELP_MODE && helpCard !== undefined) {
+            if (helpCard.src !== undefined) {
+                imgDiv = <img className='help-panel-img' src={helpCard.src} alt='card' />;
+            }
+            else {
+                imgDiv= <div className='help-panel-card'>{this.state.cardMode==='sgs' ? createSgsCard(helpCard.card) : createStsCard(helpCard.card)}</div>;
+            }
             return <div
                 className='help-panel'
             >
-                <img src={helpCard.src} alt='card' />
-                <div dangerouslySetInnerHTML={{ __html: RULES[helpCard.key] }} />
+                {imgDiv}
+                <div className='help-panel-div' dangerouslySetInnerHTML={{ __html: RULES[helpCard.key] }} />
                 <button
                     className='selectable bad'
                     onClick={() => this.setState({ mode: SetModePanel.DEFAULT_MODE, helpCard: undefined })}
@@ -840,7 +883,7 @@ export default class GameArea extends React.Component {
                 this.setState({ mode: SetModePanel.DEFAULT_MODE });
             };
         } else if (mode === SetModePanel.HELP_MODE) {
-            return () => this.setState({ helpCard: { key: card.type, src: `./cards/${card.type}.jpg` } });
+            return () => this.setState({ helpCard: { key: card.type, card: card } });
         } else if (mode === SetModePanel.COUNTRY_SCENE_MODE && selectedIndex === undefined) {
             if (card.suit === 'DIAMOND') {
                 return () => this.setState({ mode: SetModePanel.COUNTRY_SCENE_MODE, selectedIndex: index });
